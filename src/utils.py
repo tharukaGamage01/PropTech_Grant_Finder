@@ -12,25 +12,66 @@ def extract_keywords(user_input):
     return re.findall(r'\b\w+\b', user_input.lower())
 
 
+def load_categories(file_path):
+    df = pd.read_excel(file_path) if file_path else pd.DataFrame()
+    return df["Category"].dropna().unique().tolist() if "Category" in df.columns else []
+
+
 def modify_keywords(file_path):
     password = "admin123"
-    user_password = st.text_input("Enter Password:", type="password")
-    submit_password = st.button("Submit Password")
 
-    if submit_password and user_password == password:
-        st.success("Access Granted!")
-        action = st.selectbox("Choose Action", ["Add", "Remove"])
-        category = st.text_input("Enter Category:")
-        new_keyword = st.text_input("Enter Keyword:")
-        confirm_edit = st.checkbox("Confirm Edit")
+    if "authenticated" not in st.session_state:
+        st.session_state.authenticated = False
 
-        if st.button("Submit") and confirm_edit:
+    if not st.session_state.authenticated:
+        user_password = st.text_input("Enter Password:", type="password")
+        if st.button("Submit Password", key="submit_password"):
+            if user_password == password:
+                st.session_state.authenticated = True
+                st.rerun()
+            else:
+                st.error("Incorrect password! Try again.")
+        return
+
+    categories = load_categories(file_path)
+    if not categories:
+        st.error("No categories found in the file.")
+        return
+
+    action = st.selectbox("Choose Action", ["Add", "Remove"])
+    category = st.selectbox("Select Category", categories)
+
+    new_keyword = st.text_input("Enter Keyword:", value=st.session_state.get("new_keyword", ""))
+
+    if st.button("Submit", key="submit_keyword"):
+        if not new_keyword:
+            st.error("Please enter a keyword before submitting.")
+        else:
+            st.session_state.show_warning = True
+            st.session_state.new_keyword = new_keyword
+            st.rerun()
+
+    if st.session_state.get("show_warning", False):
+        st.warning("Are you sure you want to apply these changes?")
+
+        # Ensure unique keys for "OK" buttons
+        if st.button("OK", key="confirm_changes"):
             df = pd.read_excel(file_path)
-            if action == "Add" and new_keyword:
-                df = df.append({category: new_keyword}, ignore_index=True)
-            elif action == "Remove" and new_keyword in df[category].values:
-                df = df[df[category] != new_keyword]
+
+            if action == "Add":
+                new_row = pd.DataFrame({"Category": [category], "Keywords": [st.session_state.new_keyword]})
+                df = pd.concat([df, new_row], ignore_index=True)
+            elif action == "Remove":
+                df = df[~((df["Category"] == category) & (df["Keywords"] == st.session_state.new_keyword))]
+
             df.to_excel(file_path, index=False)
+
             st.success("Updated Successfully!")
-    elif submit_password:
-        st.error("Incorrect password! Try again.")
+
+            st.session_state.show_warning = False
+            st.session_state.new_keyword = ""
+            st.rerun()
+
+
+file_paths = "../data/AI Grant Finding & Writing - Keywords_M2_TG.xlsx"
+modify_keywords(file_paths)
