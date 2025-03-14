@@ -29,5 +29,6 @@ jobs:
 
   
 
-      - name: 🧪 Run Unit Tests
-        run: pytest --maxfail=3 --disable-warnings -v
+      - name: Run Tests
+        run: pytest tests/ --maxfail=3 --disable-warnings -v
+
