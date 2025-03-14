@@ -2,6 +2,7 @@ import pandas as pd
 import re
 import streamlit as st
 
+
 def load_keywords(file_path):
     try:
         if not file_path or not file_path.endswith(".xlsx"):
@@ -12,10 +13,12 @@ def load_keywords(file_path):
         st.error(f"Error loading keywords: {e}")
         return []
 
+
 def extract_keywords(user_input):
     if not user_input or not isinstance(user_input, str):
         return []
     return re.findall(r'\b\w+\b', user_input.lower())
+
 
 def load_categories(file_path):
     try:
@@ -26,6 +29,7 @@ def load_categories(file_path):
     except Exception as e:
         st.error(f"Error loading categories: {e}")
         return []
+
 
 def modify_keywords(file_path):
     password = "admin123"
