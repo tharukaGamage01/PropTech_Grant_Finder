@@ -7,6 +7,7 @@ load_dotenv()
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 SEARCH_ENGINE_ID = os.getenv("SEARCH_ENGINE_ID")
 
+
 def search_grants(query):
     if not query.strip():
         raise ValueError("Search query cannot be empty.")
@@ -17,7 +18,7 @@ def search_grants(query):
     url = f"https://www.googleapis.com/customsearch/v1?q={query}&key={GOOGLE_API_KEY}&cx={SEARCH_ENGINE_ID}"
 
     try:
-        response = requests.get(url, timeout=10)  # 10-second timeout
+        response = requests.get(url, timeout=20)
         response.raise_for_status()
         data = response.json()
     except requests.exceptions.RequestException as e:
@@ -25,7 +26,7 @@ def search_grants(query):
         return []
 
     results = []
-    for item in data.get("items", []):  # Avoids KeyError if "items" is missing
+    for item in data.get("items", []):
         results.append({
             "title": item.get("title", "No title"),
             "link": item.get("link", "#"),
