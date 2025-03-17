@@ -9,8 +9,8 @@ load_dotenv()
 logging.basicConfig(level=logging.ERROR)
 
 def search_grants(query):
-    GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")  
-    SEARCH_ENGINE_ID = os.getenv("SEARCH_ENGINE_ID")
+    GOOGLE_API_KEY = st.secrets["GOOGLE_API_KEY"]
+    SEARCH_ENGINE_ID = st.secrets["SEARCH_ENGINE_ID"]
 
     if not query.strip():
         raise ValueError("Search query cannot be empty.")
