@@ -1,7 +1,10 @@
 import pytest
-from utils import extract_keywords, load_keywords
+from src.utils import extract_keywords,load_keywords,match_keywords
 import pandas as pd
 import os
+from fuzzywuzzy import fuzz, process
+
+
 
 
 @pytest.mark.parametrize("input_text, expected_output", [
@@ -25,3 +28,20 @@ def test_load_keywords(tmp_path):
 
 def test_load_keywords_invalid_file():
     assert load_keywords("non_existent.xlsx") == []
+
+
+
+def match_keywords(word, keyword_list):
+    if not keyword_list:
+        return []
+    result = process.extractOne(word, keyword_list, scorer=fuzz.partial_ratio)
+    if result is None:
+        return []
+    best_match, _ = result
+    return [best_match] 
+
+def test_match_keywords_case_insensitive():
+    keyword_list = ["AI", "housing"]
+    result = match_keywords("HOUSING support", keyword_list)
+    assert result == ["housing"]  
+

@@ -1,19 +1,25 @@
 from sklearn.feature_extraction.text import TfidfVectorizer
-from utils import extract_keywords
+from src.utils import extract_keywords
 
-
-def rank_results(results, keyword, keyword_list):
+def rank_results(results, keywords, keyword_list):
     if not results:
         return []
 
+    if not isinstance(keywords, list):
+        raise ValueError("Keywords should be a list.")
+
+    extracted_keywords = []
+    for keyword in keywords:
+        if isinstance(keyword, str) and keyword.strip():
+            extracted_keywords.extend(extract_keywords(keyword.strip()))
+
+    if not extracted_keywords:
+        raise ValueError("No valid keywords provided.")
+
+    combined_keywords = " ".join(set(extracted_keywords + keyword_list))
+
     vectorizer = TfidfVectorizer()
     texts = [r.get("title", "") + " " + r.get("snippet", "") for r in results]
-
-    if not keyword.strip():
-        raise ValueError("Keyword cannot be empty.")
-
-    extracted_keywords = extract_keywords(keyword.strip())
-    combined_keywords = " ".join(extracted_keywords + keyword_list)
 
     try:
         tfidf_matrix = vectorizer.fit_transform(texts + [combined_keywords])
