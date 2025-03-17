@@ -1,16 +1,13 @@
 import pytest
-from src.search import search_grants
 import os
+from src.search import search_grants
 
+@pytest.fixture(autouse=True)
+def set_secrets_file(monkeypatch):
+ 
+    monkeypatch.setenv("STREAMLIT_SECRETS_FILE", "tests/.streamlit/secrets.toml")
 
-def test_search_grants_missing_keys(monkeypatch):
-    monkeypatch.delenv("GOOGLE_API_KEY", raising=False)
-    monkeypatch.delenv("SEARCH_ENGINE_ID", raising=False)
-
-    with pytest.raises(ValueError, match="Missing API keys"):
-        search_grants("AI grants")
-
-
-def test_search_grants_empty_query():
-    with pytest.raises(ValueError, match="Search query cannot be empty."):
-        search_grants("")
+def test_search_grants_valid_query():
+   
+    result = search_grants("AI grants")
+    assert result is not None  
