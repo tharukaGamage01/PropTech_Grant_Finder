@@ -1,8 +1,9 @@
 import sys
 import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from sklearn.feature_extraction.text import TfidfVectorizer
 from src.utils import extract_keywords
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 
 def rank_results(results, keywords, keyword_list):
     if not results:
