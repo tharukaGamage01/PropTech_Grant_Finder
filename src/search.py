@@ -1,14 +1,14 @@
 import os
 import requests
 import logging
-from dotenv import load_dotenv
-from urllib.parse import quote_plus  
-load_dotenv()
+import streamlit as st
+from urllib.parse import quote_plus
 
 
 logging.basicConfig(level=logging.ERROR)
 
 def search_grants(query):
+   
     GOOGLE_API_KEY = st.secrets.get("GOOGLE_API_KEY", None)
     SEARCH_ENGINE_ID = st.secrets.get("SEARCH_ENGINE_ID", None)
 
@@ -16,9 +16,8 @@ def search_grants(query):
         raise ValueError("Search query cannot be empty.")
 
     if not GOOGLE_API_KEY or not SEARCH_ENGINE_ID:
-        raise ValueError("Missing API keys. Ensure GOOGLE_API_KEY and SEARCH_ENGINE_ID are set in streamlit secrets")
+        raise ValueError("Missing API keys. Ensure GOOGLE_API_KEY and SEARCH_ENGINE_ID are set in Streamlit secrets")
 
-    
     encoded_query = quote_plus(query)
     url = f"https://www.googleapis.com/customsearch/v1?q={encoded_query}&key={GOOGLE_API_KEY}&cx={SEARCH_ENGINE_ID}"
 
