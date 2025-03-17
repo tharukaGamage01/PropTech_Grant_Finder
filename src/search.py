@@ -9,14 +9,14 @@ load_dotenv()
 logging.basicConfig(level=logging.ERROR)
 
 def search_grants(query):
-    GOOGLE_API_KEY = st.secrets["GOOGLE_API_KEY"]
-    SEARCH_ENGINE_ID = st.secrets["SEARCH_ENGINE_ID"]
+    GOOGLE_API_KEY = st.secrets.get("GOOGLE_API_KEY", None)
+    SEARCH_ENGINE_ID = st.secrets.get("SEARCH_ENGINE_ID", None)
 
     if not query.strip():
         raise ValueError("Search query cannot be empty.")
 
     if not GOOGLE_API_KEY or not SEARCH_ENGINE_ID:
-        raise ValueError("Missing API keys. Ensure GOOGLE_API_KEY and SEARCH_ENGINE_ID are set in .env")
+        raise ValueError("Missing API keys. Ensure GOOGLE_API_KEY and SEARCH_ENGINE_ID are set in streamlit secrets")
 
     
     encoded_query = quote_plus(query)
