@@ -1,5 +1,4 @@
 import sys
-import os
 import streamlit as st
 from src.search import search_grants
 from src.ranking import rank_results
