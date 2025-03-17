@@ -1,10 +1,11 @@
 import sys
+import os
 import streamlit as st
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from src.search import search_grants
 from src.ranking import rank_results
 from src.utils import load_keywords, match_keywords, modify_keywords
-import os
+
 import time
 
 
