@@ -1,9 +1,12 @@
+import sys
+import os
 import streamlit as st
 from src.search import search_grants
 from src.ranking import rank_results
 from src.utils import load_keywords, match_keywords, modify_keywords
 import os
 import time
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 st.sidebar.title("Navigation Menu")
 st.sidebar.markdown("---")
