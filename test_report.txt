@@ -1,0 +1,26 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.8.10, pytest-8.3.5, pluggy-1.5.0 -- /Users/tharukagamage/Desktop/PropTech_Grant/PropTech_Grant_Finder/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/tharukagamage/Desktop/PropTech_Grant/PropTech_Grant_Finder
+collecting ... collected 18 items
+
+tests/test_integration.py::test_full_search_flow PASSED                  [  5%]
+tests/test_integration.py::test_partial_keyword_match PASSED             [ 11%]
+tests/test_ranking.py::test_empty PASSED                                 [ 16%]
+tests/test_ranking.py::test_single PASSED                                [ 22%]
+tests/test_ranking.py::test_multiple PASSED                              [ 27%]
+tests/test_ranking.py::test_no_keywords PASSED                           [ 33%]
+tests/test_ranking.py::test_invalid_keywords PASSED                      [ 38%]
+tests/test_ranking.py::test_no_match PASSED                              [ 44%]
+tests/test_ranking.py::test_tfidf_fail PASSED                            [ 50%]
+tests/test_search.py::test_search_grants_missing_keys PASSED             [ 55%]
+tests/test_search.py::test_search_grants_empty_query PASSED              [ 61%]
+tests/test_utils.py::test_extract_keywords[AI and Housing Grants-expected_output0] PASSED [ 66%]
+tests/test_utils.py::test_extract_keywords[-expected_output1] PASSED     [ 72%]
+tests/test_utils.py::test_extract_keywords[AI, Housing! Energy?-expected_output2] PASSED [ 77%]
+tests/test_utils.py::test_extract_keywords[AI 2025 #Funding!-expected_output3] PASSED [ 83%]
+tests/test_utils.py::test_load_keywords PASSED                           [ 88%]
+tests/test_utils.py::test_load_keywords_invalid_file PASSED              [ 94%]
+tests/test_utils.py::test_match_keywords_case_insensitive PASSED         [100%]
+
+============================== 18 passed in 1.63s ==============================
