@@ -1,7 +1,8 @@
-import sys
 import os
+import sys
 from sklearn.feature_extraction.text import TfidfVectorizer
 from src.utils import extract_keywords
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 def rank_results(results, keywords, keyword_list):
@@ -10,21 +11,29 @@ def rank_results(results, keywords, keyword_list):
 
     if not isinstance(keywords, list):
         raise ValueError("Keywords should be a list.")
-
+    
+    keyword_list = keyword_list or []  
+    
     extracted_keywords = []
     for keyword in keywords:
         if isinstance(keyword, str) and keyword.strip():
             extracted_keywords.extend(extract_keywords(keyword.strip()))
 
     if not extracted_keywords:
-        raise ValueError("No valid keywords provided.")
+        return results
 
-    combined_keywords = " ".join(set(extracted_keywords + keyword_list))
+    combined_keywords = " ".join(set(extracted_keywords + keyword_list)).strip()
+    if not combined_keywords:
+        return results
 
-    vectorizer = TfidfVectorizer()
-    texts = [r.get("title", "") + " " + r.get("snippet", "") for r in results]
+    texts = [r.get("title", "").strip() + " " + r.get("snippet", "").strip() for r in results]
+    texts = [t for t in texts if t.strip()]  
+
+    if not texts:
+        return results
 
     try:
+        vectorizer = TfidfVectorizer()
         tfidf_matrix = vectorizer.fit_transform(texts + [combined_keywords])
         cosine_similarities = (tfidf_matrix * tfidf_matrix.T).A[-1][:-1]
         ranked_results = sorted(zip(results, cosine_similarities), key=lambda x: x[1], reverse=True)
