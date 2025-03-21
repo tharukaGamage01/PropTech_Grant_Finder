@@ -5,7 +5,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from src.search import search_grants
 from src.ranking import rank_results
 from src.utils import load_keywords, match_keywords, modify_keywords
-
+import os
 import time
 
 
@@ -46,27 +46,33 @@ def search_grants_action():
     user_input = st.session_state.get("search_input", "").strip()
 
     if not user_input:
-        st.session_state["ranked_results"] = None  
         show_alert("Please enter a keyword", "warning")
         return
 
-    matched_keyword = match_keywords(user_input, keyword_list)  
-    if not matched_keyword:
+    matched_keywords = match_keywords(user_input, keyword_list)  
+
+    if not matched_keywords:
+        show_alert("No matching keywords found. Try using relevant terms.", "error")
         st.session_state["ranked_results"] = None  
-        show_alert("No matching keywords found. Please use relevant keywords.", "error")
         return
 
-    search_query = matched_keyword  
-    search_results = search_grants(search_query)
+    search_results = []
+    
+    for keyword in matched_keywords:
+        results = search_grants(keyword)
+        if results:
+            search_results.extend(results)
 
     if search_results:
-        ranked_results = rank_results(search_results, [matched_keyword], keyword_list)
+        ranked_results = rank_results(search_results, matched_keywords, keyword_list)
         st.session_state["ranked_results"] = ranked_results
     else:
+        show_alert("No grants found for the given keyword(s). Try using different keywords.", "error")
         st.session_state["ranked_results"] = None  
-        show_alert("No grants found. Try using a different keyword.", "error")
-    
+
     st.session_state["last_search"] = user_input  
+
+
 
 def render_search_page():
     st.markdown("<h1 style='text-align: center;'>PropTech Grant Finder</h1>", unsafe_allow_html=True)
@@ -114,3 +120,4 @@ if st.session_state.page == "Search Grants":
     render_search_page()
 elif st.session_state.page == "Edit Keywords":
     modify_keywords(file_path)
+

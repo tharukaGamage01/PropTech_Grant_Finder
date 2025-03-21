@@ -4,7 +4,8 @@ import streamlit as st
 from fuzzywuzzy import fuzz, process
 import time
 import os
-
+from dotenv import load_dotenv
+load_dotenv()
 
 def show_alert(message, alert_type="info", duration=2):
     alert_container = st.empty()  
@@ -32,30 +33,45 @@ def load_keywords(file_path):
         return []
 
 def extract_keywords(user_input):
-    if not user_input or not isinstance(user_input, str):
-        return []
     return re.findall(r'\b\w+\b', user_input.lower())
 
-def load_categories(file_path):
+
+
+def load_keywords(file_path):
     try:
         if not file_path or not file_path.endswith(".xlsx"):
             raise ValueError("Invalid file path or format.")
         df = pd.read_excel(file_path, dtype=str)
-        return df["Category"].dropna().unique().tolist() if "Category" in df.columns else []
+        
+        if "Keywords" not in df.columns:
+            raise ValueError("Column 'Keywords' not found in file.")
+        
+        keyword_list = df["Keywords"].dropna().tolist()
+        
+        print("Loaded Keywords:", keyword_list) 
+        return keyword_list
     except Exception as e:
-        show_alert(f"Error loading categories: {e}", "error")
+        print(f"Error loading keywords: {e}")
         return []
 
-def match_keywords(word, keyword_list):
-    if not keyword_list:
-        return None  
 
-    result = process.extractOne(word, keyword_list, scorer=fuzz.partial_ratio)
-    return result[0] if result else None  
+def match_keywords(user_input, keyword_list):
+    if not keyword_list:
+        return []
+
+    extracted_words = extract_keywords(user_input)  # Extract words
+    matched_keywords = set()  
+
+    for word in extracted_words:
+        best_match, score = process.extractOne(word, keyword_list, scorer=fuzz.partial_ratio)
+        if score >= 80:  # Adjust threshold as needed
+            matched_keywords.add(best_match)
+
+    return list(matched_keywords) if matched_keywords else None
 
 def modify_keywords(file_path):
    
-    password = st.secrets.get("PASSWORD", None)
+    password = os.getenv("PASSWORD")
 
     if "authenticated" not in st.session_state:
         st.session_state.authenticated = False
@@ -115,3 +131,4 @@ def modify_keywords(file_path):
                 st.rerun()
             except Exception as e:
                 show_alert(f"Error updating the file: {e}", "error")
+
