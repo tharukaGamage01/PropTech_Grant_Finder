@@ -4,8 +4,7 @@ import streamlit as st
 from fuzzywuzzy import fuzz, process
 import time
 import os
-from dotenv import load_dotenv
-load_dotenv()
+
 
 def show_alert(message, alert_type="info", duration=2):
     alert_container = st.empty()  
@@ -71,7 +70,7 @@ def match_keywords(user_input, keyword_list):
 
 def modify_keywords(file_path):
    
-    password = os.getenv("PASSWORD")
+    password = st.secrets.get(("PASSWORD",None)
 
     if "authenticated" not in st.session_state:
         st.session_state.authenticated = False
