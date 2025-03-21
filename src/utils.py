@@ -37,34 +37,34 @@ def extract_keywords(user_input):
 
 
 
-def load_keywords(file_path):
-    try:
-        if not file_path or not file_path.endswith(".xlsx"):
-            raise ValueError("Invalid file path or format.")
-        df = pd.read_excel(file_path, dtype=str)
+# def load_keywords(file_path):
+#     try:
+#         if not file_path or not file_path.endswith(".xlsx"):
+#             raise ValueError("Invalid file path or format.")
+#         df = pd.read_excel(file_path, dtype=str)
         
-        if "Keywords" not in df.columns:
-            raise ValueError("Column 'Keywords' not found in file.")
+#         if "Keywords" not in df.columns:
+#             raise ValueError("Column 'Keywords' not found in file.")
         
-        keyword_list = df["Keywords"].dropna().tolist()
+#         keyword_list = df["Keywords"].dropna().tolist()
         
-        print("Loaded Keywords:", keyword_list) 
-        return keyword_list
-    except Exception as e:
-        print(f"Error loading keywords: {e}")
-        return []
+#         print("Loaded Keywords:", keyword_list) 
+#         return keyword_list
+#     except Exception as e:
+#         print(f"Error loading keywords: {e}")
+#         return []
 
 
 def match_keywords(user_input, keyword_list):
     if not keyword_list:
         return []
 
-    extracted_words = extract_keywords(user_input)  # Extract words
+    extracted_words = extract_keywords(user_input)  
     matched_keywords = set()  
 
     for word in extracted_words:
         best_match, score = process.extractOne(word, keyword_list, scorer=fuzz.partial_ratio)
-        if score >= 80:  # Adjust threshold as needed
+        if score >= 80:  
             matched_keywords.add(best_match)
 
     return list(matched_keywords) if matched_keywords else None
@@ -91,10 +91,10 @@ def modify_keywords(file_path):
         show_alert("Invalid file path or format.", "error")
         return
 
-    categories = load_categories(file_path)
-    if not categories:
-        show_alert("No categories found in the file.", "error")
-        return
+    # categories = load_categories(file_path)
+    # if not categories:
+    #     show_alert("No categories found in the file.", "error")
+    #     return
 
     action = st.selectbox("Choose Action", ["Add", "Remove"])
     category = st.selectbox("Select Category", categories)
