@@ -31,7 +31,7 @@ def test_multiple():
 def test_no_keywords():
     results = [{"title": "AI Grant", "snippet": "Funding"}]
     ranked = rank_results(results, [], ["AI", "Funding"])
-    assert ranked == results  # Should return unranked results instead of raising an error
+    assert ranked == results  
 
 def test_invalid_keywords():
     with pytest.raises(ValueError, match="Keywords should be a list."):
@@ -45,7 +45,7 @@ def test_no_match():
     
     ranked = rank_results(results, ["AI"], ["AI", "Tech"])
     
-    assert ranked == results  # Should return unranked results when no match
+    assert ranked == results  
 
 def test_tfidf_fail():
     results = [{"title": "", "snippet": ""}]  
