@@ -9,11 +9,11 @@ def rank_results(results, keywords, keyword_list):
     if not results:
         return []
 
-    
+    # Ensure keywords is a list
     if not isinstance(keywords, list):
         keywords = [keywords] if isinstance(keywords, str) else []
 
-    
+    # Ensure keyword_list is a list
     keyword_list = keyword_list if isinstance(keyword_list, list) else []
 
     extracted_keywords = []
@@ -23,16 +23,15 @@ def rank_results(results, keywords, keyword_list):
 
     if not extracted_keywords:
         return results  
-
     combined_keywords = " ".join(set(extracted_keywords + keyword_list)).strip()
     if not combined_keywords:
-        return results 
-
+        return results  
     texts = [r.get("title", "").strip() + " " + r.get("snippet", "").strip() for r in results]
     texts = [t for t in texts if t.strip()]  
 
     if not texts:
         return results  
+
     try:
         vectorizer = TfidfVectorizer()
         tfidf_matrix = vectorizer.fit_transform(texts + [combined_keywords])
