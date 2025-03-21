@@ -71,7 +71,7 @@ def match_keywords(user_input, keyword_list):
 
 def modify_keywords(file_path):
    
-    password = os.getenv("PASSWORD")
+    password =  st.secrets.get("PASSWORD")
 
     if "authenticated" not in st.session_state:
         st.session_state.authenticated = False
