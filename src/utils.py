@@ -35,26 +35,6 @@ def load_keywords(file_path):
 def extract_keywords(user_input):
     return re.findall(r'\b\w+\b', user_input.lower())
 
-
-
-# def load_keywords(file_path):
-#     try:
-#         if not file_path or not file_path.endswith(".xlsx"):
-#             raise ValueError("Invalid file path or format.")
-#         df = pd.read_excel(file_path, dtype=str)
-        
-#         if "Keywords" not in df.columns:
-#             raise ValueError("Column 'Keywords' not found in file.")
-        
-#         keyword_list = df["Keywords"].dropna().tolist()
-        
-#         print("Loaded Keywords:", keyword_list) 
-#         return keyword_list
-#     except Exception as e:
-#         print(f"Error loading keywords: {e}")
-#         return []
-
-
 def match_keywords(user_input, keyword_list):
     if not keyword_list:
         return []
@@ -69,9 +49,7 @@ def match_keywords(user_input, keyword_list):
 
     return list(matched_keywords) if matched_keywords else None
 
-
 def modify_keywords(file_path):
-   
     password = st.secrets.get("PASSWORD")
 
     if "authenticated" not in st.session_state:
@@ -92,46 +70,43 @@ def modify_keywords(file_path):
         show_alert("Invalid file path or format.", "error")
         return
 
-    categories = load_categories(file_path)
-    if not categories:
-        show_alert("No categories found in the file.", "error")
-        return
-
     action = st.selectbox("Choose Action", ["Add", "Remove"])
-    category = st.selectbox("Select Category", categories)
     new_keyword = st.text_input("Enter Keyword:", value=st.session_state.get("new_keyword", "")).strip()
 
     if st.button("Submit", key="submit_keyword"):
         if not new_keyword:
             show_alert("Please enter a keyword before submitting.", "error")
-        else:
-            st.session_state.new_keyword = new_keyword
-            try:
-                df = pd.read_excel(file_path, dtype=str)
-                if "Category" not in df.columns or "Keywords" not in df.columns:
-                    show_alert("Invalid file format. Please ensure 'Category' and 'Keywords' columns exist.", "error")
+            return
+
+        st.session_state.new_keyword = new_keyword
+
+        try:
+            df = pd.read_excel(file_path, dtype=str)
+            if "Keywords" not in df.columns:
+                show_alert("Invalid file format. Ensure 'Keywords' column exists.", "error")
+                return
+
+            if action == "Add":
+                if new_keyword not in df["Keywords"].values:
+                    new_row = pd.DataFrame({"Keywords": [new_keyword]})
+                    df = pd.concat([df, new_row], ignore_index=True)
+                    show_alert("Keyword added successfully!", "success")
+                else:
+                    show_alert("Keyword already exists.", "warning")
                     return
+            elif action == "Remove":
+                if new_keyword not in df["Keywords"].values:
+                    show_alert("Keyword not found.", "warning")
+                    return
+                df = df[df["Keywords"] != new_keyword]
+                show_alert("Keyword removed successfully!", "success")
 
-                if action == "Add":
-                    if df[(df["Category"] == category) & (df["Keywords"] == new_keyword)].empty:
-                        new_row = pd.DataFrame({"Category": [category], "Keywords": [new_keyword]})
-                        df = pd.concat([df, new_row], ignore_index=True)
-                        show_alert("Keyword added successfully!", "success")
-                    else:
-                        show_alert("Keyword already exists in the selected category.", "warning")
-                        return
-                elif action == "Remove":
-                    if df[(df["Category"] == category) & (df["Keywords"] == new_keyword)].empty:
-                        show_alert("Keyword not found in the selected category.", "warning")
-                        return
-                    df = df[~((df["Category"] == category) & (df["Keywords"] == new_keyword))]
-                    show_alert("Keyword removed successfully!", "success")
+            df.to_excel(file_path, index=False)
+            st.session_state.new_keyword = ""
+            st.rerun()
+        except Exception as e:
+            show_alert(f"Error updating the file: {e}", "error")
 
-                df.to_excel(file_path, index=False)
-                st.session_state.new_keyword = ""
-                st.rerun()
-            except Exception as e:
-                show_alert(f"Error updating the file: {e}", "error")
 
 
 # def modify_keywords(file_path):
